@@ -1,4 +1,4 @@
-#include <torch/script.h> // One-stop header.
+#include <torch/script.h>
 #include <iostream>
 #include <vector>
 #include <ncurses.h>
@@ -8,6 +8,8 @@
 #include <string>
 
 #define SIZE 28
+char fill_char = '@';
+char stroke_char = '*';
 
 void print_matrix(char matrix[SIZE][SIZE]) {
     for (int i = 0; i < SIZE; i++) {
@@ -21,14 +23,14 @@ void print_matrix(char matrix[SIZE][SIZE]) {
 void clear_matrix(char matrix[SIZE][SIZE]) {
     for (int i = 0; i < SIZE; i++)
         for (int j = 0; j < SIZE; j++)
-            matrix[i][j] = '#'; // Set to empty character
+            matrix[i][j] = fill_char; // Set to empty character
 }
 
 std::vector<float> prepare_input(char matrix[SIZE][SIZE]) {
     std::vector<float> input(SIZE * SIZE);
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
-            input[i * SIZE + j] = (matrix[i][j] == '*') ? 1.0f : 0.0f; // Normalize input (binary in this case)
+            input[i * SIZE + j] = (matrix[i][j] == stroke_char) ? 1.0f : 0.0f; // Normalize input (binary in this case)
         }
     }
     return input;
@@ -69,7 +71,7 @@ int main(int argc, const char* argv[]) {
     char matrix[SIZE][SIZE];
     for (int i = 0; i < SIZE; ++i) {
         for (int j = 0; j < SIZE; ++j) {
-            matrix[i][j] = '#'; // Initialize with empty character
+            matrix[i][j] = fill_char; // Initialize with empty character
         }
     }
 
@@ -129,10 +131,10 @@ int main(int argc, const char* argv[]) {
                     matrix[y][x] = '*';
                     
                     // Optional: Draw around the cursor
-                    if (x + 1 < SIZE) matrix[y][x + 1] = '*';
-                    if (y + 1 < SIZE) matrix[y + 1][x] = '*';
-                    if (x - 1 >= 0) matrix[y][x - 1] = '*';
-                    if (y - 1 >= 0) matrix[y - 1][x] = '*';
+                    if (x + 1 < SIZE) matrix[y][x + 1] = stroke_char;
+                    if (y + 1 < SIZE) matrix[y + 1][x] = stroke_char;
+                    if (x - 1 >= 0) matrix[y][x - 1] = stroke_char;
+                    if (y - 1 >= 0) matrix[y - 1][x] = stroke_char;
 
                     print_matrix(matrix);
                 }
