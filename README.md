@@ -71,6 +71,35 @@ To compile the C++ interface, follow these steps:
     make
     ```
 
-After these steps, an executable named `draw-and-recognize-mnist` should be created in the `build` directory, ready to run with your trained model.
+After these steps, an executable named `character_recog` should be created in the `build` directory, ready to run with your trained model.
 
+## Running the Interface
+Launch the application with:
 
+```bash
+./character_recog <path_to_the_trained_model>
+```
+In my case 
+
+```bash
+./character_recog ../mnist_CNN.pt
+```
+
+### Instructions
+
+- **Draw**: Use your mouse to draw a digit directly in the terminal.
+- **Predict**: Press `p` to classify the drawn digit.
+- **Clear**: Press `c` to erase the current drawing and start over.
+- **Quit**: Press `q` to exit the application.
+
+## Troubleshooting
+
+### Common Errors
+
+1. **libtorch.so: No such file or directory**
+   - This error usually indicates that LibTorch is not installed or the paths provided during compilation are incorrect.
+   - **Solution**: Verify that LibTorch is installed, and make sure the paths to the LibTorch headers and libraries are correct in the compilation command.
+
+2. **Mouse not working**
+   - If the mouse input is not functioning as expected, it might be due to a missing or incompatible `ncurses` installation.
+   - **Solution**: Ensure that `ncurses` is properly installed on your system and that your terminal supports mouse input.
