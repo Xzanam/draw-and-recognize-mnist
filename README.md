@@ -92,6 +92,12 @@ In my case
 - **Clear**: Press `c` to erase the current drawing and start over.
 - **Quit**: Press `q` to exit the application.
 
+### Demo 
+
+https://github.com/user-attachments/assets/56e49099-b4cf-49cc-a5d3-efea0a439e38
+
+
+
 ## Troubleshooting
 
 ### Common Errors
