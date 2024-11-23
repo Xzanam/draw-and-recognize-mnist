@@ -104,7 +104,7 @@ https://github.com/user-attachments/assets/56e49099-b4cf-49cc-a5d3-efea0a439e38
 
 1. **libtorch.so: No such file or directory**
    - This error usually indicates that LibTorch is not installed or the paths provided during compilation are incorrect.
-   - **Solution**: Verify that LibTorch is installed, and make sure the paths to the LibTorch headers and libraries are correct in the compilation command.
+   - **Solution**: Verify that LibTorch is installed.
 
 2. **Mouse not working**
    - If the mouse input is not functioning as expected, it might be due to a missing or incompatible `ncurses` installation.
