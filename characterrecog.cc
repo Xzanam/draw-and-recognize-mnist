@@ -54,10 +54,42 @@ void export_matrix(const std::vector<float>& input) {
     printf("Matrix exported successfully to matrix.csv\n");
 }
 
+
+/*
+#####################################################
+#           predict function                        #
+#          For Normal Feed Forward model that       #
+#      expects input as [1, 28, 28]                 #
+#####################################################
+*/
+
+
+// int predict(torch::jit::script::Module &model, const std::vector<float> &input) {
+//     auto tensor_input = torch::from_blob((void*)input.data(), {1, 1, SIZE, SIZE}, torch::kFloat32); // Add batch dimension and channel
+//     tensor_input = tensor_input.unsqueeze(0); // Ensure it has the correct shape
+
+//     std::vector<torch::jit::IValue> inputs;
+//     inputs.push_back(tensor_input);
+//     at::Tensor output = model.forward(inputs).toTensor();
+
+//     auto max_result = output.argmax(1);
+//     return max_result.item<int>(); // Return the predicted class index
+// }
+
+
+
+
+/*
+#####################################################
+#           predict function                        #
+#          For CNN Model that expects input as      #
+#               [1, 1, 28, 28]                      #
+#####################################################
+*/
+
 int predict(torch::jit::script::Module &model, const std::vector<float> &input) {
-    // export_matrix(input); // Export the matrix before predicting
-    auto tensor_input = torch::from_blob((void*)input.data(), {1, 1, SIZE, SIZE}, torch::kFloat32); // Add batch dimension and channel
-    tensor_input = tensor_input.unsqueeze(0); // Ensure it has the correct shape
+    // Prepare the input tensor with the correct shape [batch_size, channels, height, width]
+    auto tensor_input = torch::from_blob((void*)input.data(), {1, 1, SIZE, SIZE}, torch::kFloat32); // [1, 1, 28, 28] shape
 
     std::vector<torch::jit::IValue> inputs;
     inputs.push_back(tensor_input);
@@ -66,6 +98,7 @@ int predict(torch::jit::script::Module &model, const std::vector<float> &input) 
     auto max_result = output.argmax(1);
     return max_result.item<int>(); // Return the predicted class index
 }
+
 
 int main(int argc, const char* argv[]) {
     char matrix[SIZE][SIZE];

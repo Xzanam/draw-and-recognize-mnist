@@ -213,3 +213,4 @@ libtorch/
 matrix.csv
 mnist_data/ 
 mnist_model.pt
+mnist_CNN.pt
