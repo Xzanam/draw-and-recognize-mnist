@@ -11,10 +11,10 @@
 char fill_char = '@';
 char stroke_char = '*';
 
-void print_matrix(char matrix[SIZE][SIZE]) {
+void print_matrix(char matrix[SIZE][SIZE], int start_y, int start_x) {
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
-            mvprintw(i + 1, j * 2, "%c", matrix[i][j]);
+            mvprintw(start_y + i, start_x + j * 2, "%c", matrix[i][j]);
         }
     }
     refresh();
@@ -54,39 +54,6 @@ void export_matrix(const std::vector<float>& input) {
     printf("Matrix exported successfully to matrix.csv\n");
 }
 
-
-/*
-#####################################################
-#           predict function                        #
-#          For Normal Feed Forward model that       #
-#      expects input as [1, 28, 28]                 #
-#####################################################
-*/
-
-
-// int predict(torch::jit::script::Module &model, const std::vector<float> &input) {
-//     auto tensor_input = torch::from_blob((void*)input.data(), {1, 1, SIZE, SIZE}, torch::kFloat32); // Add batch dimension and channel
-//     tensor_input = tensor_input.unsqueeze(0); // Ensure it has the correct shape
-
-//     std::vector<torch::jit::IValue> inputs;
-//     inputs.push_back(tensor_input);
-//     at::Tensor output = model.forward(inputs).toTensor();
-
-//     auto max_result = output.argmax(1);
-//     return max_result.item<int>(); // Return the predicted class index
-// }
-
-
-
-
-/*
-#####################################################
-#           predict function                        #
-#          For CNN Model that expects input as      #
-#               [1, 1, 28, 28]                      #
-#####################################################
-*/
-
 int predict(torch::jit::script::Module &model, const std::vector<float> &input) {
     // Prepare the input tensor with the correct shape [batch_size, channels, height, width]
     auto tensor_input = torch::from_blob((void*)input.data(), {1, 1, SIZE, SIZE}, torch::kFloat32); // [1, 1, 28, 28] shape
@@ -98,7 +65,6 @@ int predict(torch::jit::script::Module &model, const std::vector<float> &input) 
     auto max_result = output.argmax(1);
     return max_result.item<int>(); // Return the predicted class index
 }
-
 
 int main(int argc, const char* argv[]) {
     char matrix[SIZE][SIZE];
@@ -134,8 +100,16 @@ int main(int argc, const char* argv[]) {
 
     printf("\033[?1003h\n"); // Enable mouse tracking
 
+    // Get terminal dimensions
+    int term_rows, term_cols;
+    getmaxyx(stdscr, term_rows, term_cols);
+
+    // Calculate the starting position for centering the matrix
+    int start_y = (term_rows - SIZE) / 2;
+    int start_x = (term_cols - (SIZE * 2)) / 2; // Each column is 2 characters wide
+
     mvprintw(0, 0, "Drag the mouse to update the matrix. Press 'q' to quit. Press 'p' to predict. Press 'c' to clear.");
-    print_matrix(matrix);
+    print_matrix(matrix, start_y, start_x);
 
     while (1) {
         int ch = getch();
@@ -143,16 +117,16 @@ int main(int argc, const char* argv[]) {
             break;
         } else if (ch == 'c') {
             clear_matrix(matrix);
-            print_matrix(matrix);
+            print_matrix(matrix, start_y, start_x);
         } else if (ch == 'p') {
             std::vector<float> input = prepare_input(matrix);
             int prediction = predict(model, input);
-            mvprintw(SIZE + 2, 0, "Predicted Digit: %d", prediction);
+            mvprintw(start_y + SIZE + 1, start_x, "Predicted Digit: %d", prediction);
             refresh();
         } else if (ch == KEY_MOUSE) {
             if (getmouse(&event) == OK) {
-                int x = event.x / 2; // Calculate the matrix column index
-                int y = event.y - 1; // Adjusting for instruction line
+                int x = (event.x - start_x) / 2; // Adjust for the centered position
+                int y = event.y - start_y;       // Adjust for the centered position
 
                 if (event.bstate & BUTTON1_PRESSED) {
                     dragging = true;
@@ -161,7 +135,7 @@ int main(int argc, const char* argv[]) {
                 }
 
                 if (dragging && x >= 0 && x < SIZE && y >= 0 && y < SIZE) {
-                    matrix[y][x] = '*';
+                    matrix[y][x] = stroke_char;
                     
                     // Optional: Draw around the cursor
                     if (x + 1 < SIZE) matrix[y][x + 1] = stroke_char;
@@ -169,7 +143,7 @@ int main(int argc, const char* argv[]) {
                     if (x - 1 >= 0) matrix[y][x - 1] = stroke_char;
                     if (y - 1 >= 0) matrix[y - 1][x] = stroke_char;
 
-                    print_matrix(matrix);
+                    print_matrix(matrix, start_y, start_x);
                 }
             }
         }
